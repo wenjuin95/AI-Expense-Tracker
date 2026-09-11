@@ -19,6 +19,8 @@ An expense tracker that uses OCR and an Ollama vision model to extract expense d
                          ↓
                  ExpenseValidator
                          ↓
+                Delete temporary file
+                         ↓
                   Return OCR Draft
                          ↓
                 ┌─────────────────┐
@@ -31,16 +33,16 @@ An expense tracker that uses OCR and an Ollama vision model to extract expense d
              DISCARD             SAVE
                 │                 │
                 ↓                 ↓
-        Delete temporary      POST /expenses
-             receipt               │
+        Delete OCR Draft      POST /expenses
+                                  │
                                   ↓
                          Validate final data
                                   ↓
                          ExpenseRepository
                                   ↓
-                     ┌────────────┼────────────┐
-                     ↓            ↓            ↓
-                  Receipt      Expense    ExpenseItems
+                     ┌─────────────────────────┐
+                     ↓                         ↓
+                   Expense               ExpenseItems
                      └────────────┼────────────┘
                                   ↓
                                 SQLite
