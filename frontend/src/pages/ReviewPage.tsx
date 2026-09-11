@@ -2,6 +2,7 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveExpense } from "../api/expenseApi";
 import PreventRefresh from "../components/PreventRefresh";
+import Popup from "../components/Popup";
 import type {
     ScanResponse,
     ExpenseData,
@@ -83,6 +84,8 @@ export default function ReviewReceipt({
 
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showDiscardPopup, setShowDiscardPopup] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const updateField = (
         field: keyof ExpenseData,
@@ -144,7 +147,7 @@ export default function ReviewReceipt({
 
             await saveExpense(draft);
 
-            handleSaved();
+            setShowSuccessPopup(true);
         } catch (error) {
             setError(
                 error instanceof Error
@@ -159,6 +162,36 @@ export default function ReviewReceipt({
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <PreventRefresh enabled />
+            <Popup
+                open={showDiscardPopup}
+                type="cancel"
+                title="Discard Receipt?"
+                message="Your review changes will be lost. Are you sure you want to discard this receipt?"
+                onOk={() => {
+                    setShowDiscardPopup(false);
+                    handleDiscard();
+                }}
+                onCancel={() => setShowDiscardPopup(false)}
+                okLabel="Discard"
+            />
+            <Popup
+                open={showSuccessPopup}
+                type="success"
+                title="Expense Saved"
+                message="The expense was saved successfully."
+                onOk={() => {
+                    setShowSuccessPopup(false);
+                    handleSaved();
+                }}
+                okLabel={currentResultIndex >= results.length - 1 ? "Done" : "Next Receipt"}
+            />
+            <Popup
+                open={Boolean(error)}
+                type="error"
+                title="Save Error"
+                message={error ?? ""}
+                onOk={() => setError(null)}
+            />
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -556,18 +589,11 @@ export default function ReviewReceipt({
                         </div>
                     )}
 
-                    {/* Error */}
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                            ⚠️ {error}
-                        </div>
-                    )}
-
                     {/* Actions */}
                     <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                         <button
                             type="button"
-                            onClick={handleDiscard}
+                            onClick={() => setShowDiscardPopup(true)}
                             disabled={saving}
                             className="px-5 py-2.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 disabled:opacity-50"
                         >

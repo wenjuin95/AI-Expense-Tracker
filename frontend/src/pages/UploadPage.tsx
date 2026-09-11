@@ -4,6 +4,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { uploadReceiptsBatch } from "../api/expenseApi";
 import type { ScanResponse } from "../types/expenses";
 import PreventRefresh from "../components/PreventRefresh";
+import Popup from "../components/Popup";
 import ReviewReceipt from "./ReviewPage";
 
 export default function UploadPage() {
@@ -71,6 +72,13 @@ export default function UploadPage() {
 	return (
 		<div className="max-w-4xl mx-auto space-y-6">
 			<PreventRefresh enabled={Boolean(files?.length || results?.length)} />
+			<Popup
+				open={Boolean(error)}
+				type="error"
+				title="Upload Error"
+				message={error ?? ""}
+				onOk={() => setError(null)}
+			/>
 			<div>
 				<h1 className="text-2xl font-bold text-slate-900">Upload Receipt</h1>
 				<p className="text-sm text-slate-500 mt-1">
@@ -147,11 +155,6 @@ export default function UploadPage() {
 				</button>
 			</div>
 
-			{error && (
-				<div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-					⚠️ {error}
-				</div>
-			)}
 		</div>
 	);
 }

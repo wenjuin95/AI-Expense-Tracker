@@ -9,7 +9,6 @@ import Layout from "./components/Layout";
 
 import UploadPage from "./pages/UploadPage";
 import ExpensesPage from "./pages/ExpensesPage";
-import ExpenseDetailPage from "./pages/ExpensesDetailPage";
 
 import "./App.css";
 
@@ -37,12 +36,6 @@ export default function App() {
           <Route
             path="/expenses"
             element={<ExpensesPage />}
-          />
-
-          {/* /expenses/123 */}
-          <Route
-            path="/expenses/:id"
-            element={<ExpenseDetailPage />}
           />
 
           {/* /upload */}

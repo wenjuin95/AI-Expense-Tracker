@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getExpenses, getExpense, deleteExpense } from "../api/expenseApi";
 import type { Expense, ExpenseDetail} from "../types/expenses";
+import Popup from "../components/Popup";
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -53,10 +55,20 @@ export default function ExpensesPage() {
 
   return (
     <div className="space-y-6">
+	  <Popup
+	  		open={showDeletePopup}
+			type="cancel"
+			title="Delete Expense"
+			message="Are you sure you want to delete this expense?"
+			onOk={() => {
+				handleDelete(expandedId!);
+				setShowDeletePopup(false);
+			}}
+			onCancel={() => setShowDeletePopup(false)}
+			okLabel="Delete"
+			cancelLabel="Cancel"
+	  />
       <h1 className="text-2xl font-bold text-slate-900">Expenses</h1>
-
-      {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{error}</div>}
-
       {expenses.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-400">No expenses yet.</div>
       ) : (
@@ -81,7 +93,7 @@ export default function ExpensesPage() {
                   detail={expandedId === expense.id ? selectedExpense : null}
                   loading={expandedId === expense.id && detailLoading}
                   onExpand={handleExpand}
-                  onDelete={handleDelete}
+                  onDelete={() => setShowDeletePopup(true)}
                 />
               ))}
             </tbody>
