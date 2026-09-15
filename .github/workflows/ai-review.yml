@@ -9,7 +9,7 @@ on:
 
 jobs:
   review:
-    uses: wenjuin95/AI-code-review/.github/workflows/review.yml
+    uses: wenjuin95/AI-code-review/.github/workflows/review.yml@main
 
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
