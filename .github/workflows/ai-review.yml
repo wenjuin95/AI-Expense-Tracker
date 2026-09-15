@@ -7,6 +7,10 @@ on:
       - synchronize
       - reopened
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   review:
     uses: wenjuin95/AI-code-review/.github/workflows/review.yml@main
