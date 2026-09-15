@@ -1,4 +1,4 @@
-name: AI Code Review
+name: Gemini Code Review
 
 on:
   pull_request:
@@ -13,6 +13,12 @@ permissions:
 
 jobs:
   review:
-    uses: wenjuin95/AI-code-review/.github/workflows/review.yml@main
-    secrets:
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Gemini Code Review
+        uses: wenjuin95/AI-code-review@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-3.5-flash-lite
