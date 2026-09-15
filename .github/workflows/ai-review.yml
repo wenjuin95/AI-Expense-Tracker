@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Gemini Code Review
-        uses: wenjuin95/AI-code-review@main
+        uses: wenjuin95/AI-code-review@1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
