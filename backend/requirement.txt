@@ -5,3 +5,4 @@ ollama
 pymupdf
 sqlalchemy
 python-dotenv
+google-genai

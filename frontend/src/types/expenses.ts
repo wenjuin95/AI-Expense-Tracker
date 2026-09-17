@@ -106,3 +106,12 @@ export interface BatchScanResponse {
     failed: number;
     results: BatchScanResult[];
 }
+
+export interface ExpensePieChartProps {
+	expenses: Expense[];
+}
+
+export interface CategoryData {
+	name: string;
+	value: number;
+}

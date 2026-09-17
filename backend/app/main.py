@@ -9,7 +9,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-origins = os.getenv("BACKEND_CORS_ORIGINS")
+origins = [
+    origin.strip()
+    for origin in os.getenv("BACKEND_CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 Base.metadata.create_all(
     bind=engine

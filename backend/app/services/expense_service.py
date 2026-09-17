@@ -3,13 +3,13 @@ class ExpenseService:
 	def __init__(
 		self,
 		receipt_processor,
-		ollama_client,
+		model_client,
 		json_parser,
 		validator,
 		model,
 	):
 		self.receipt_processor = receipt_processor
-		self.ollama = ollama_client
+		self.model_client = model_client
 		self.parser = json_parser
 		self.validator = validator
 		self.model = model
@@ -25,8 +25,8 @@ class ExpenseService:
 
 			print(f"Prepared: {image}")
 
-			# Run Ollama
-			result = self.ollama.read_receipt_and_extract(
+			# Run the selected model provider
+			result = self.model_client.read_receipt_and_extract(
 				self.model,
 				image
 			)

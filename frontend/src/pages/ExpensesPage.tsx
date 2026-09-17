@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { getExpenses, getExpense, deleteExpense } from "../api/expenseApi";
 import type { Expense, ExpenseDetail} from "../types/expenses";
 import Popup from "../components/Popup";
+import ExpensePieChart from "../components/ExpenseChart";
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -55,20 +57,34 @@ export default function ExpensesPage() {
 
   return (
     <div className="space-y-6">
-	  <Popup
-	  		open={showDeletePopup}
-			type="cancel"
-			title="Delete Expense"
-			message="Are you sure you want to delete this expense?"
-			onOk={() => {
-				handleDelete(expandedId!);
-				setShowDeletePopup(false);
-			}}
-			onCancel={() => setShowDeletePopup(false)}
-			okLabel="Delete"
-			cancelLabel="Cancel"
-	  />
+
+      <Popup
+              open={showDeletePopup}
+            type="cancel"
+            title="Delete Expense"
+            message="Are you sure you want to delete this expense?"
+            onOk={async () => {
+                if (deleteId === null) return;
+
+                await handleDelete(deleteId);
+                setDeleteId(null);
+                setShowDeletePopup(false);
+            }}
+            onCancel={() => {
+                setDeleteId(null);
+                setShowDeletePopup(false)
+            }}
+            okLabel="Delete"
+            cancelLabel="Cancel"
+      />
+
+      {/* Title */}
       <h1 className="text-2xl font-bold text-slate-900">Expenses</h1>
+
+      {/* Expense Overview Chart */}
+      <ExpensePieChart expenses={expenses} />
+
+      {/* Expense History */}
       {expenses.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-400">No expenses yet.</div>
       ) : (
@@ -93,7 +109,10 @@ export default function ExpensesPage() {
                   detail={expandedId === expense.id ? selectedExpense : null}
                   loading={expandedId === expense.id && detailLoading}
                   onExpand={handleExpand}
-                  onDelete={() => setShowDeletePopup(true)}
+                  onDelete={(id: number) => {
+                    setDeleteId(id);
+                    setShowDeletePopup(true);
+                  }}
                 />
               ))}
             </tbody>
@@ -104,23 +123,65 @@ export default function ExpensesPage() {
   );
 }
 
-function ExpenseRow({ expense, expanded, detail, loading, onExpand, onDelete }: any) {
+function ExpenseRow({
+    expense,
+    expanded,
+    detail,
+    loading,
+    onExpand,
+    onDelete
+}: any) {
   return (
     <>
-      <tr onClick={() => onExpand(expense.id)} className="hover:bg-slate-50/80 cursor-pointer transition-colors">
-        <td className="p-4 text-slate-400 font-mono">{expanded ? "▼" : "▶"}</td>
-        <td className="p-4 font-semibold text-slate-800">{expense.merchant ?? "-"}</td>
-        <td className="p-4 text-slate-600">{expense.date ?? "-"}</td>
-        <td className="p-4"><span className="px-2.5 py-1 bg-slate-100 rounded-full text-xs font-medium text-slate-600">{expense.category ?? "-"}</span></td>
-        <td className="p-4 font-bold text-blue-600">{expense.currency ?? ""} {expense.total ?? "-"}</td>
+      <tr
+        onClick={() => onExpand(expense.id)}
+        className="hover:bg-slate-50/80 cursor-pointer transition-colors"
+      >
+        <td className="p-4 text-slate-400 font-mono">
+            {expanded ? "▼" : "▶"}
+        </td>
+
+        <td className="p-4 font-semibold text-slate-800">
+            {expense.merchant ?? "-"}
+        </td>
+
+        <td className="p-4 text-slate-600">
+            {expense.date ?? "-"}
+        </td>
+
+        <td className="p-4">
+            <span className="px-2.5 py-1 bg-slate-100 rounded-full text-xs font-medium text-slate-600">
+                {expense.category ?? "-"}
+            </span>
+        </td>
+
+        <td className="p-4 font-bold text-blue-600">
+            {expense.currency ?? ""} {expense.total ?? "-"}
+        </td>
+
         <td className="p-4 text-right">
-          <button onClick={e => (e.stopPropagation(), onDelete(expense.id))} className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors">Delete</button>
+          <button
+            onClick={(e) => {
+                e.stopPropagation();
+                onDelete(expense.id);
+            }}
+            className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
+          >
+            Delete
+          </button>
         </td>
       </tr>
+
       {expanded && (
-        <tr className="bg-slate-50/50">
+        <tr
+            className="bg-slate-50/50"
+        >
           <td colSpan={6} className="p-6">
-            {loading ? <p className="text-slate-400 text-sm">Loading details...</p> : detail && <ExpenseDetail expense={detail} />}
+            {loading ? (
+                <p className="text-slate-400 text-sm">Loading details...</p>
+            ) : (
+                detail && <ExpenseDetail expense={detail} />
+            )}
           </td>
         </tr>
       )}
@@ -135,7 +196,7 @@ function ExpenseDetail({ expense }: { expense: ExpenseDetail }) {
         <div><span className="text-xs text-slate-400 block">Payment Method</span><span className="font-medium text-slate-700">{expense.payment_method ?? "-"}</span></div>
         <div><span className="text-xs text-slate-400 block">Tax</span><span className="font-medium text-slate-700">{expense.tax ?? 0}</span></div>
         <div><span className="text-xs text-slate-400 block">Discount</span><span className="font-medium text-slate-700">{expense.discount ?? 0}</span></div>
-        <div><span className="text-xs text-slate-400 block">Total</span><span className="font-medium text-slate-700">{expense.subtotal ?? "-"}</span></div>
+        <div><span className="text-xs text-slate-400 block">Total</span><span className="font-medium text-slate-700">{expense.total ?? "-"}</span></div>
       </div>
 
       <div>
@@ -146,10 +207,10 @@ function ExpenseDetail({ expense }: { expense: ExpenseDetail }) {
           <table className="w-full text-left text-xs border border-slate-100 rounded-lg overflow-hidden">
             <thead className="bg-slate-100 text-slate-500">
               <tr>
-				<th className="p-2.5">Item</th>
-				<th className="p-2.5">Qty</th>
-				<th className="p-2.5">Price</th>
-				</tr>
+                <th className="p-2.5">Item</th>
+                <th className="p-2.5">Qty</th>
+                <th className="p-2.5">Price</th>
+                </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {expense.items.map((item: any) => (

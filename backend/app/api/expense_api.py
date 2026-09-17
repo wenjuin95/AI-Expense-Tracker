@@ -13,6 +13,7 @@ from backend.app.schemas.expense_schema import ExpenseCreate
 
 from backend.app.services.receipt_processor import ReceiptProcessor
 from backend.app.clients.ollama_client import OllamaClient
+from backend.app.clients.gemini_client import GeminiClient
 from backend.app.utils.json_parser import JsonParser
 from backend.app.services.validator import ExpenseValidator
 from backend.app.services.expense_service import ExpenseService
@@ -34,9 +35,24 @@ receipt_processor = ReceiptProcessor(
 	pdf_dpi=Config.PDF_DPI,
 )
 
-ollama_client = OllamaClient(
-	option=Config.MODEL_OPTIONS
-)
+if Config.MODEL_PROVIDER == "ollama":
+	model_client = OllamaClient(
+		option=Config.MODEL_OPTIONS
+	)
+	selected_model = Config.MODELS[0]
+elif Config.MODEL_PROVIDER == "gemini":
+	model_client = GeminiClient(
+		api_key=Config.GEMINI_API_KEY,
+		model_name=Config.GEMINI_MODEL,
+	)
+	selected_model = {
+		"name": "gemini",
+		"model": Config.GEMINI_MODEL,
+	}
+else:
+	raise ValueError(
+		"MODEL_PROVIDER must be either 'ollama' or 'gemini'"
+	)
 
 json_parser = JsonParser()
 
@@ -94,10 +110,10 @@ async def scan_receipt(
 
 		expense_service = ExpenseService(
 			receipt_processor=receipt_processor,
-			ollama_client=ollama_client,
+			model_client=model_client,
 			json_parser=json_parser,
 			validator=validator,
-			model=Config.MODELS[0],
+			model=selected_model,
 		)
 
 		return expense_service.process_receipt(file_path)
@@ -124,10 +140,10 @@ async def scan_receipts_batch(
 
 	expense_service = ExpenseService(
 		receipt_processor=receipt_processor,
-		ollama_client=ollama_client,
+		model_client=model_client,
 		json_parser=json_parser,
 		validator=validator,
-		model=Config.MODELS[0],
+		model=selected_model,
 	)
 
 	for file in files:

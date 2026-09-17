@@ -45,8 +45,8 @@ class OllamaClient:
 			print(output)
 
 			return {
-				"Model": model_name,
-				"Model type": model_type,
+				"model": model_name,
+				"model_id": model_type,
 				"success": True,
 				"time_seconds": round(total_execution, 2),
 				"response": output,
@@ -61,8 +61,8 @@ class OllamaClient:
 			print(str(e))
 
 			return {
-				"Model": model_name,
-				"Model type": model_type,
+				"model": model_name,
+				"model_id": model_type,
 				"success": False,
 				"time_seconds": round(total_execution, 2),
 				"response": None,

@@ -1,93 +1,224 @@
 # AI-Expense-Tracker
-An expense tracker that uses OCR and an Ollama vision model to extract expense data from uploaded receipts.
+An expense tracker that uses OCR and vision-capable AI models through Ollama or Google Gemini to extract structured expense data from receipts.
+
+The application allows users to upload one or multiple receipts, automatically extract expense information, review and edit the extracted data, and save the final result into a SQLite database.
+
+## What Problem Does It Solve?
+Managing expenses from physical or digital receipts can involve repetitive manual work. Users need to read information from receipts, enter it into a system, verify the values, and organize the expenses before they can be useful for tracking or analysis.
+
+This project addresses several of these problems:
+
+### **Reduce Manual Data Entry**
+Manually entering expenses from receipts can be repetitive and time-consuming.
+
+### **Convert Unstructured Receipts into Structured Data**
+A receipt is primarily a visual document. The information is not naturally stored as structured fields that an application can easily query or analyze.
+
+The application converts the receipt into structured expense data.
+```text
+Receipt Image / PDF
+        ↓
+    Vision Model
+        ↓
+      JSON
+        ↓
+Expense + Expense Items
+```
+> This makes the extracted information usable by the application for expense history, filtering, and analysis.
+<br>
+
+### **Avoid Mixing AI Processing with Permanent Data Storage**
+Receipt scanning and expense storage are treated as separate operations.
+
+Scanning a receipt produces a temporary draft:
+```text
+POST /expenses/scan
+        ↓
+   Process Receipt
+        ↓
+    Return Draft
+```
+Only after the user confirms the information is the expense saved:
+```text
+POST /expenses
+        ↓
+ Final Validation
+        ↓
+     SQLite
+```
+> This separation makes the workflow safer because an AI-generated result does not automatically become a permanent expense.
+<br>
+
+### **Simplify Repetitive Receipt Processing**
+Users may have multiple receipts that need to be entered.
+
+Instead of processing each receipt through a completely separate workflow, the application supports batch receipt scanning.
+```text
+Receipt 1 ──┐
+Receipt 2 ──┤
+Receipt 3 ──┼──→ Batch Processing
+Receipt 4 ──┤
+Receipt 5 ──┘
+                  ↓
+            Expense Drafts
+                  ↓
+             User Review
+```
+> Multiple receipts can therefore be processed through the same extraction pipeline.
+<br>
+
+### **Turn Saved Expenses into Useful Information**
+Simply storing expenses is not enough if the user cannot easily understand their spending.
+
+Once expenses are stored as structured data, the application can organize them into expense history and summarize spending by category.
+```text
+Saved Expenses
+      ↓
+Structured Data
+      ↓
+Expense History
+      ↓
+Category Summary
+      ↓
+Understand Spending
+```
+> This provides a foundation for further features such as monthly spending summaries, filtering, budgets, and other expense analytics.
+<br>
 
 ## Workflow
+The application can also process multiple receipts in one request.
 ```text
-                 ┌───────────────┐
-                 │ Select Receipt│
-                 └───────┬───────┘
-                         ↓
-                POST /expenses/scan
-                         ↓
-                  Save temporary file
-                         ↓
-                  ReceiptProcessor
-                         ↓
-                    OllamaClient
-                         ↓
-                     JsonParser
-                         ↓
-                 ExpenseValidator
-                         ↓
-                Delete temporary file
-                         ↓
-                  Return OCR Draft
-                         ↓
-                ┌─────────────────┐
-                │  User Reviews   │
-                │  & Edits        │
-                └────────┬────────┘
+                  USER
+                   │
+                   ▼
+             Upload Receipt
+                   │
+                   ▼
+              React Frontend
+                   │
+                   ▼
+          POST /expenses/scan
+                   │
+                   ▼
+          Temporary File Storage
+                   │
+                   ▼
+          ReceiptProcessor
+                   │
+                   ▼
+             Vision AI Model
+                   │
+                   ▼
+              JsonParser
+                   │
+                   ▼
+          ExpenseValidator
+                   │
+                   ▼
+             Expense Draft
+                   │
+                   ▼
+            Review & Edit
+                   │
+             ┌─────┴─────┐
+             │           │
+         Discard       Save
+             │           │
+             ▼           ▼
+       Delete Temp   POST /expenses
+             |           │
+             ▼           ▼
+           Delete   Final Validation
+       Expense Draft     │
+                         ▼
+                 ExpenseRepository
                          │
-                ┌────────┴────────┐
-                ↓                 ↓
-             DISCARD             SAVE
-                │                 │
-                ↓                 ↓
-        Delete OCR Draft      POST /expenses
-                                  │
-                                  ↓
-                         Validate final data
-                                  ↓
-                         ExpenseRepository
-                                  ↓
-                     ┌─────────────────────────┐
-                     ↓                         ↓
-                   Expense               ExpenseItems
-                     └────────────┼────────────┘
-                                  ↓
-                                SQLite
+                         ▼
+                      SQLite
+                         │
+                         ▼
+                  Expense History
 ```
-Receipt files are temporary processing inputs. They are not saved in the database and are deleted after scanning. The database stores the extracted expense information and its line items.
+> Receipts are processed sequentially to avoid running multiple vision-model requests at the same time.
+<br>
 
-## Application Structure
-```text
-backend/app/
-├── main.py                    # Creates the FastAPI application
-├── api/expense_api.py         # Expense routes
-├── clients/ollama_client.py   # Ollama integration and prompts
-├── core/config.py             # Application configuration
-├── database/                  # SQLAlchemy connection and models
-├── repositories/              # Database queries and writes
-├── schemas/                   # Pydantic request models
-├── services/                  # Receipt processing and validation
-└── utils/json_parser.py       # Model-response JSON parsing
+## Prerequisites
+Docker
+Ollama
+Python
 
-frontend/src/
-├── api/expenseApi.ts          # Backend HTTP requests
-├── components/Layout.tsx      # Shared application layout
-├── pages/                     # Upload, list, and detail screens
-└── types/expenses.ts          # Shared frontend types
+## Ollama Setup
+If you want to run the AI model locally, install Ollama and make sure it is running.
+
+Verify:
 ```
+ollama --version
+```
+Check installed models:
+```
+ollama list
+```
+Pull a supported vision model, for example:
+```
+ollama pull gemma3:4b
+```
+> The exact model can be configured in the backend configuration.
+> Make sure Ollama is accessible from the backend container.
+<br>
 
-## API Routes
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `POST` | `/expenses/scan` | Upload and process a receipt temporarily |
-| `POST` | `/expenses` | Save the reviewed expense to SQLite |
-| `GET` | `/expenses` | List saved expenses |
-| `GET` | `/expenses/{expense_id}` | View one expense and its items |
-| `DELETE` | `/expenses/{expense_id}` | Delete one expense |
+## Gemini Setup
+If using Google Gemini, create a Gemini API key and place it in:
+```
+backend/.env
+
+Example:
+
+MODEL_PROVIDER=gemini
+GEMINI_API_KEY=your_api_key
+```
+> Do not commit .env or API keys to Git.
+<br>
 
 ## Running the Application
-Start the backend from the repository root:
-```bash
-uvicorn backend.app.main:app --reload
+1. Clone the repository:
+```
+git clone <your-repository-url>
+cd AI-Expense-Tracker
 ```
 
-Start the frontend in a second terminal:
-```bash
-cd frontend
-npm install
-npm run dev
+2. Configure the backend environment:
 ```
+cp backend/.env.example backend/.env
+```
+Then edit:
+```
+backend/.env
+```
+
+3. Choose your AI provider.
+For Ollama:
+```
+MODEL_PROVIDER=ollama
+```
+For Gemini:
+```
+MODEL_PROVIDER=gemini
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
+GEMINI_MODEL=YOUR_MODEL_NAME_HERE
+```
+
+4. Start build the application
+```bash
+make build
+```
+
+5. Start run the application
+```bash
+make run
+```
+
+> The services will start the backend and frontend.
+> Frontend: http://localhost:5173
+> Backend API: http://localhost:8000
+> FastAPI documentation: http://localhost:8000/docs
 

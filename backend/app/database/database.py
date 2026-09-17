@@ -3,7 +3,9 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 from backend.app.core.config import Config
 
-DATABASE_URL = f"sqlite:///{Config.BASE_DIR / 'expense_tracker.db'}"
+Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+DATABASE_URL = f"sqlite:///{Config.DATA_DIR / 'expense_tracker.db'}"
 
 
 engine = create_engine(
