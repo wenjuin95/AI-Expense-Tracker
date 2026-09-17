@@ -217,8 +217,8 @@ make build
 make run
 ```
 
-> The services will start the backend and frontend.
-> Frontend: http://localhost:5173
-> Backend API: http://localhost:8000
-> FastAPI documentation: http://localhost:8000/docs
+> The services will start the backend and frontend. <br>
+> Frontend: http://localhost:5173 <br>
+> Backend API: http://localhost:8000 <br>
+> FastAPI documentation: http://localhost:8000/docs <br>
 
