@@ -1,17 +1,17 @@
-# AI-Expense-Tracker
+# 📝AI-Expense-Tracker
 An expense tracker that uses OCR and vision-capable AI models through Ollama or Google Gemini to extract structured expense data from receipts.
 
 The application allows users to upload one or multiple receipts, automatically extract expense information, review and edit the extracted data, and save the final result into a SQLite database.
 
-## What Problem Does It Solve?
+## 💡What Problem Does It Solve?
 Managing expenses from physical or digital receipts can involve repetitive manual work. Users need to read information from receipts, enter it into a system, verify the values, and organize the expenses before they can be useful for tracking or analysis.
 
 This project addresses several of these problems:
 
-### **Reduce Manual Data Entry**
+### 1. **Reduce Manual Data Entry**
 Manually entering expenses from receipts can be repetitive and time-consuming.
 
-### **Convert Unstructured Receipts into Structured Data**
+### 2. **Convert Unstructured Receipts into Structured Data**
 A receipt is primarily a visual document. The information is not naturally stored as structured fields that an application can easily query or analyze.
 
 The application converts the receipt into structured expense data.
@@ -27,7 +27,7 @@ Expense + Expense Items
 > This makes the extracted information usable by the application for expense history, filtering, and analysis.
 <br>
 
-### **Avoid Mixing AI Processing with Permanent Data Storage**
+### 3. **Avoid Mixing AI Processing with Permanent Data Storage**
 Receipt scanning and expense storage are treated as separate operations.
 
 Scanning a receipt produces a temporary draft:
@@ -49,7 +49,7 @@ POST /expenses
 > This separation makes the workflow safer because an AI-generated result does not automatically become a permanent expense.
 <br>
 
-### **Simplify Repetitive Receipt Processing**
+### 4. **Simplify Repetitive Receipt Processing**
 Users may have multiple receipts that need to be entered.
 
 Instead of processing each receipt through a completely separate workflow, the application supports batch receipt scanning.
@@ -67,7 +67,7 @@ Receipt 5 ──┘
 > Multiple receipts can therefore be processed through the same extraction pipeline.
 <br>
 
-### **Turn Saved Expenses into Useful Information**
+### 5. **Turn Saved Expenses into Useful Information**
 Simply storing expenses is not enough if the user cannot easily understand their spending.
 
 Once expenses are stored as structured data, the application can organize them into expense history and summarize spending by category.
@@ -85,7 +85,7 @@ Understand Spending
 > This provides a foundation for further features such as monthly spending summaries, filtering, budgets, and other expense analytics.
 <br>
 
-## Workflow
+## 💭Workflow
 The application can also process multiple receipts in one request.
 ```text
                   USER
@@ -143,9 +143,10 @@ The application can also process multiple receipts in one request.
 <br>
 
 ## Prerequisites
-Docker
-Ollama
-Python
+- Docker
+- Ollama
+- Python
+- pip
 
 ## Ollama Setup
 If you want to run the AI model locally, install Ollama and make sure it is running.
@@ -196,6 +197,7 @@ backend/.env
 ```
 
 3. Choose your AI provider.
+
 For Ollama:
 ```
 MODEL_PROVIDER=ollama
