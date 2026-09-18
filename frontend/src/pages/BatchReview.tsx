@@ -47,7 +47,7 @@ export default function BatchReviewPage({
     }
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">
                     Review Receipts
@@ -58,15 +58,17 @@ export default function BatchReviewPage({
                 </p>
             </div>
 
-            {results.map((result, index) => (
-                <ReviewReceipt
-                    key={index}
-                    result={result}
-                    index={index}
-                    total={results.length}
-                    onComplete={handleReceiptComplete}
-                />
-            ))}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+				{results.map((result, index) => (
+					<ReviewReceipt
+						key={index}
+						result={result}
+						index={index}
+						total={results.length}
+						onComplete={handleReceiptComplete}
+					/>
+				))}
+			</div>
         </div>
     );
 }

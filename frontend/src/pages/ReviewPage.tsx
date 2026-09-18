@@ -148,8 +148,8 @@ export default function ReviewReceipt({
     // Render the replacement board if processed
     if (saved || discarded) {
         return (
-            <div className="max-w-4xl mx-auto space-y-6">
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col items-center justify-center py-16">
+            <div className="w-full h-full">
+                <div className="h-full min-h-[300px] bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col items-center justify-center py-16 px-6 text-center">
                     <span className={`px-5 py-2 rounded-full font-bold text-lg ${saved ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
                         {saved ? "Saved" : "Cancelled"}
                     </span>
