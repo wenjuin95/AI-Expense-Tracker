@@ -5,12 +5,11 @@ import { uploadReceiptsBatch } from "../api/expenseApi";
 import type { ScanResponse } from "../types/expenses";
 import PreventRefresh from "../components/PreventRefresh";
 import Popup from "../components/Popup";
-import ReviewReceipt from "./ReviewPage";
+import BatchReviewPage from "./BatchReview";
 
 export default function UploadPage() {
 	const [files, setFiles] = useState<File[] | null>(null);
 	const [results, setResults] = useState<ScanResponse[] | null>(null);
-	const [currentResultIndex, setCurrentResultIndex] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +22,6 @@ export default function UploadPage() {
 
 		setFiles((prevFiles) => (prevFiles ? [...prevFiles, ...selectedFiles] : selectedFiles));
 		setResults(null);
-		setCurrentResultIndex(0);
 		setError(null);
 
 		event.target.value = "";
@@ -41,7 +39,6 @@ export default function UploadPage() {
 
 			const batch = await uploadReceiptsBatch(files);
 			setResults(batch.results);
-			setCurrentResultIndex(0);
 
 		} catch (error) {
 			setError(
@@ -57,14 +54,10 @@ export default function UploadPage() {
 	// If OCR is complete, render the review component
 	if (results && results.length > 0) {
 		return (
-			<ReviewReceipt
-				key={currentResultIndex}
-				result={results[currentResultIndex]}
+			<BatchReviewPage
 				results={results}
-				currentResultIndex={currentResultIndex}
 				setResults={setResults}
 				setFiles={setFiles}
-				setCurrentResultIndex={setCurrentResultIndex}
 			/>
 		);
 	}

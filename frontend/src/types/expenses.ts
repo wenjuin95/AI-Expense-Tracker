@@ -23,14 +23,11 @@ export interface ExpenseData {
 	items: ExpenseItem[];
 }
 
-
 export interface ScanResponse {
 	success: boolean;
-
 	data: ExpenseData | null;
 
 	valid: boolean;
-
 	saved: boolean;
 
 	validation_error: string | null;
@@ -42,15 +39,14 @@ export interface ScanResponse {
 	error?: string | null;
 }
 
-
-export interface SaveExpenseRequest
-	extends ExpenseData {}
+export interface SaveExpenseRequest extends ExpenseData {}
 
 
 export interface SaveExpenseResponse {
 	success: boolean;
 	saved: boolean;
 	expense_id: number;
+	receipt_id: number;
 }
 
 
@@ -94,17 +90,17 @@ export interface ExpenseFullDetail {
 }
 
 export interface BatchScanResult extends ScanResponse {
-    original_filename?: string;
-    batch_id?: string;
+	original_filename?: string;
+	batch_id?: string;
 }
 
 export interface BatchScanResponse {
-    success: boolean;
-    batch_id: string;
-    total: number;
-    successful: number;
-    failed: number;
-    results: BatchScanResult[];
+	success: boolean;
+	batch_id: string;
+	total: number;
+	successful: number;
+	failed: number;
+	results: BatchScanResult[];
 }
 
 export interface ExpensePieChartProps {

@@ -11,36 +11,43 @@ import type {
 
 interface ReviewReceiptProps {
     result: ScanResponse;
-    results: ScanResponse[];
-    currentResultIndex: number;
+    index: number;
+    total: number;
     setResults: Dispatch<SetStateAction<ScanResponse[] | null>>;
     setFiles: Dispatch<SetStateAction<File[] | null>>;
-    setCurrentResultIndex: Dispatch<SetStateAction<number>>;
 }
 
 export default function ReviewReceipt({
     result,
-    results,
-    currentResultIndex,
+    index,
+    total,
     setResults,
     setFiles,
-    setCurrentResultIndex,
 }: ReviewReceiptProps) {
+    const [saved, setSaved] = useState(false);
+
     const navigate = useNavigate();
 
     const handleDiscard = () => {
-        setResults(null);
-        setFiles(null);
-        setCurrentResultIndex(0);
-    };
+        setResults((current) => {
+            if (!current) return null;
 
-    const handleSaved = () => {
-        if (currentResultIndex >= results.length - 1) {
-            navigate("/expenses");
-            return;
-        }
+            const updated = current.filter(
+                (_, resultIndex) => resultIndex !== index
+            );
 
-        setCurrentResultIndex((index) => index + 1);
+            return updated.length > 0 ? updated : null;
+        });
+
+        setFiles((current) => {
+            if (!current) return null;
+
+            const updated = current.filter(
+                (_, fileIndex) => fileIndex !== index
+            );
+
+            return updated.length > 0 ? updated : null;
+        });
     };
 
     const [draft, setDraft] = useState<ExpenseData>(() => {
@@ -146,7 +153,7 @@ export default function ReviewReceipt({
             setError(null);
 
             await saveExpense(draft);
-
+            setSaved(true);
             setShowSuccessPopup(true);
         } catch (error) {
             setError(
@@ -161,12 +168,14 @@ export default function ReviewReceipt({
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
+
             <PreventRefresh enabled />
+
             <Popup
                 open={showDiscardPopup}
                 type="cancel"
                 title="Discard Receipt?"
-                message="Your review changes will be lost. Are you sure you want to discard this receipt?"
+                message={`Are you sure you want to discard Receipt ${index + 1}?`}
                 onOk={() => {
                     setShowDiscardPopup(false);
                     handleDiscard();
@@ -174,17 +183,18 @@ export default function ReviewReceipt({
                 onCancel={() => setShowDiscardPopup(false)}
                 okLabel="Discard"
             />
+
             <Popup
                 open={showSuccessPopup}
                 type="success"
                 title="Expense Saved"
-                message="The expense was saved successfully."
+                message={`Receipt ${index + 1} was saved successfully.`}
                 onOk={() => {
                     setShowSuccessPopup(false);
-                    handleSaved();
                 }}
-                okLabel={currentResultIndex >= results.length - 1 ? "Done" : "Next Receipt"}
+                okLabel="OK"
             />
+
             <Popup
                 open={Boolean(error)}
                 type="error"
@@ -192,17 +202,30 @@ export default function ReviewReceipt({
                 message={error ?? ""}
                 onOk={() => setError(null)}
             />
+
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
                     <h2 className="text-lg font-bold text-slate-900">
-                        Review Receipt
+                        Receipt {index + 1}
                     </h2>
 
                     <p className="text-sm text-slate-500 mt-1">
                         OCR results may contain mistakes. Please check the
                         information before saving.
                     </p>
+
+                    <span className="text-xs font-medium text-slate-500">
+                        {index + 1} / {total}
+                    </span>
+
+                    {/* if save then show saved badge */}
+                    {saved && (
+                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                            Saved
+                        </span>
+                    )}
                 </div>
 
                 <div className="p-6 space-y-6">
@@ -594,7 +617,7 @@ export default function ReviewReceipt({
                         <button
                             type="button"
                             onClick={() => setShowDiscardPopup(true)}
-                            disabled={saving}
+                            disabled={saving || saved}
                             className="px-5 py-2.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 disabled:opacity-50"
                         >
                             Discard
@@ -603,10 +626,10 @@ export default function ReviewReceipt({
                         <button
                             type="button"
                             onClick={handleSave}
-                            disabled={saving}
+                            disabled={saving || saved}
                             className="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {saving ? "Saving..." : "Save Expense"}
+                            {saved ? "Saved" : saving ? "Saving..." : "Save Expense"}
                         </button>
                     </div>
                 </div>
