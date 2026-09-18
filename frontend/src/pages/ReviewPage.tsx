@@ -1,5 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { saveExpense } from "../api/expenseApi";
 import PreventRefresh from "../components/PreventRefresh";
 import Popup from "../components/Popup";
@@ -13,41 +12,22 @@ interface ReviewReceiptProps {
     result: ScanResponse;
     index: number;
     total: number;
-    setResults: Dispatch<SetStateAction<ScanResponse[] | null>>;
-    setFiles: Dispatch<SetStateAction<File[] | null>>;
+    onComplete: () => void;
 }
 
 export default function ReviewReceipt({
     result,
     index,
     total,
-    setResults,
-    setFiles,
+    onComplete,
 }: ReviewReceiptProps) {
     const [saved, setSaved] = useState(false);
+    const [discarded, setDiscarded] = useState(false);
 
-    const navigate = useNavigate();
 
     const handleDiscard = () => {
-        setResults((current) => {
-            if (!current) return null;
-
-            const updated = current.filter(
-                (_, resultIndex) => resultIndex !== index
-            );
-
-            return updated.length > 0 ? updated : null;
-        });
-
-        setFiles((current) => {
-            if (!current) return null;
-
-            const updated = current.filter(
-                (_, fileIndex) => fileIndex !== index
-            );
-
-            return updated.length > 0 ? updated : null;
-        });
+        setDiscarded(true);
+        onComplete();
     };
 
     const [draft, setDraft] = useState<ExpenseData>(() => {
@@ -92,7 +72,6 @@ export default function ReviewReceipt({
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showDiscardPopup, setShowDiscardPopup] = useState(false);
-    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const updateField = (
         field: keyof ExpenseData,
@@ -154,7 +133,7 @@ export default function ReviewReceipt({
 
             await saveExpense(draft);
             setSaved(true);
-            setShowSuccessPopup(true);
+            onComplete();
         } catch (error) {
             setError(
                 error instanceof Error
@@ -165,6 +144,22 @@ export default function ReviewReceipt({
             setSaving(false);
         }
     };
+
+    // Render the replacement board if processed
+    if (saved || discarded) {
+        return (
+            <div className="max-w-4xl mx-auto space-y-6">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col items-center justify-center py-16">
+                    <span className={`px-5 py-2 rounded-full font-bold text-lg ${saved ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+                        {saved ? "Saved" : "Cancelled"}
+                    </span>
+                    <p className="text-sm text-slate-500 mt-4">
+                        Receipt {index + 1} of {total}
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -182,17 +177,6 @@ export default function ReviewReceipt({
                 }}
                 onCancel={() => setShowDiscardPopup(false)}
                 okLabel="Discard"
-            />
-
-            <Popup
-                open={showSuccessPopup}
-                type="success"
-                title="Expense Saved"
-                message={`Receipt ${index + 1} was saved successfully.`}
-                onOk={() => {
-                    setShowSuccessPopup(false);
-                }}
-                okLabel="OK"
             />
 
             <Popup
@@ -219,13 +203,6 @@ export default function ReviewReceipt({
                     <span className="text-xs font-medium text-slate-500">
                         {index + 1} / {total}
                     </span>
-
-                    {/* if save then show saved badge */}
-                    {saved && (
-                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
-                            Saved
-                        </span>
-                    )}
                 </div>
 
                 <div className="p-6 space-y-6">
@@ -617,7 +594,7 @@ export default function ReviewReceipt({
                         <button
                             type="button"
                             onClick={() => setShowDiscardPopup(true)}
-                            disabled={saving || saved}
+                            disabled={saving}
                             className="px-5 py-2.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 disabled:opacity-50"
                         >
                             Discard
@@ -626,7 +603,7 @@ export default function ReviewReceipt({
                         <button
                             type="button"
                             onClick={handleSave}
-                            disabled={saving || saved}
+                            disabled={saving}
                             className="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {saved ? "Saved" : saving ? "Saving..." : "Save Expense"}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ScanResponse } from "../types/expenses";
 import ReviewReceipt from "../pages/ReviewPage";
@@ -14,12 +15,26 @@ export default function BatchReviewPage({
     setFiles,
 }: BatchReviewPageProps) {
     const navigate = useNavigate();
+	const [processedCount, setProcessedCount] = useState(0);
 
-    const handleDiscardAll = () => {
-        setResults(null);
-        setFiles(null);
-        navigate("/");
-    };
+	const handleReceiptComplete = () => {
+        setProcessedCount((prevCount) => {
+            const newCount = prevCount + 1;
+
+            // If all receipts have been processed (saved or cancelled)
+            if (newCount === results.length) {
+                // Add a small delay so the user can see the final "Saved" or "Cancelled" UI
+                setTimeout(() => {
+                    setResults(null);
+                    setFiles(null);
+                    // Redirect to the expense overview page
+                    navigate("/");
+                }, 1000);
+            }
+
+            return newCount;
+        });
+    }
 
     if (results.length === 0) {
         return (
@@ -49,8 +64,7 @@ export default function BatchReviewPage({
                     result={result}
                     index={index}
                     total={results.length}
-                    setResults={setResults}
-                    setFiles={setFiles}
+                    onComplete={handleReceiptComplete}
                 />
             ))}
         </div>
