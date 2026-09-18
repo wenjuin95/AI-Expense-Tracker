@@ -9,10 +9,10 @@ Managing expenses from physical or digital receipts can involve repetitive manua
 This project addresses several of these problems:
 
 ### 1. **Reduce Manual Data Entry**
-Manually entering expenses from receipts can be repetitive and time-consuming.
+- Manually entering expenses from receipts can be repetitive and time-consuming.
 
 ### 2. **Convert Unstructured Receipts into Structured Data**
-A receipt is primarily a visual document. The information is not naturally stored as structured fields that an application can easily query or analyze.
+- A receipt is primarily a visual document. The information is not naturally stored as structured fields that an application can easily query or analyze.
 
 The application converts the receipt into structured expense data.
 ```text
@@ -28,7 +28,8 @@ Expense + Expense Items
 <br>
 
 ### 3. **Avoid Mixing AI Processing with Permanent Data Storage**
-Receipt scanning and expense storage are treated as separate operations.
+<img src="public/multiple%20review.png" width="100%"><br>
+- Receipt scanning and expense storage are treated as separate operations.
 
 Scanning a receipt produces a temporary draft:
 ```text
@@ -50,7 +51,8 @@ POST /expenses
 <br>
 
 ### 4. **Simplify Repetitive Receipt Processing**
-Users may have multiple receipts that need to be entered.
+<img src="public/multiple%20receipt.png" width="100%"><br>
+- Users may have multiple receipts that need to be entered.
 
 Instead of processing each receipt through a completely separate workflow, the application supports batch receipt scanning.
 ```text
@@ -68,7 +70,8 @@ Receipt 5 ──┘
 <br>
 
 ### 5. **Turn Saved Expenses into Useful Information**
-Simply storing expenses is not enough if the user cannot easily understand their spending.
+<img src="public/expense%20overview.png" width="100%"><br>
+- Simply storing expenses is not enough if the user cannot easily understand their spending.
 
 Once expenses are stored as structured data, the application can organize them into expense history and summarize spending by category.
 ```text
