@@ -8,11 +8,11 @@ Managing expenses from physical or digital receipts can involve repetitive manua
 
 This project addresses several of these problems:
 
-### 1. **Reduce Manual Data Entry**
-Manually entering expenses from receipts can be repetitive and time-consuming.
+### ℹ️ **Reduce Manual Data Entry**
+- Manually entering expenses from receipts can be repetitive and time-consuming.
 
-### 2. **Convert Unstructured Receipts into Structured Data**
-A receipt is primarily a visual document. The information is not naturally stored as structured fields that an application can easily query or analyze.
+### ℹ️ **Convert Unstructured Receipts into Structured Data**
+- A receipt is primarily a visual document. The information is not naturally stored as structured fields that an application can easily query or analyze.
 
 The application converts the receipt into structured expense data.
 ```text
@@ -27,8 +27,9 @@ Expense + Expense Items
 > This makes the extracted information usable by the application for expense history, filtering, and analysis.
 <br>
 
-### 3. **Avoid Mixing AI Processing with Permanent Data Storage**
-Receipt scanning and expense storage are treated as separate operations.
+### ℹ️ **Avoid Mixing AI Processing with Permanent Data Storage**
+<img src="public/multiple%20review.png" width="100%"><br>
+- Receipt scanning and expense storage are treated as separate operations.
 
 Scanning a receipt produces a temporary draft:
 ```text
@@ -49,8 +50,9 @@ POST /expenses
 > This separation makes the workflow safer because an AI-generated result does not automatically become a permanent expense.
 <br>
 
-### 4. **Simplify Repetitive Receipt Processing**
-Users may have multiple receipts that need to be entered.
+### ℹ️ **Simplify Repetitive Receipt Processing**
+<img src="public/multiple%20receipt.png" width="100%"><br>
+- Users may have multiple receipts that need to be entered.
 
 Instead of processing each receipt through a completely separate workflow, the application supports batch receipt scanning.
 ```text
@@ -67,8 +69,9 @@ Receipt 5 ──┘
 > Multiple receipts can therefore be processed through the same extraction pipeline.
 <br>
 
-### 5. **Turn Saved Expenses into Useful Information**
-Simply storing expenses is not enough if the user cannot easily understand their spending.
+### ℹ️ **Turn Saved Expenses into Useful Information**
+<img src="public/expense%20overview.png" width="100%"><br>
+- Simply storing expenses is not enough if the user cannot easily understand their spending.
 
 Once expenses are stored as structured data, the application can organize them into expense history and summarize spending by category.
 ```text
@@ -148,7 +151,7 @@ The application can also process multiple receipts in one request.
 - Python
 - pip
 
-## Ollama Setup
+## 💻 Ollama Setup
 If you want to run the AI model locally, install Ollama and make sure it is running.
 
 Verify:
@@ -167,7 +170,7 @@ ollama pull gemma3:4b
 > Make sure Ollama is accessible from the backend container.
 <br>
 
-## Gemini Setup
+## 💻🌐 Gemini Setup
 If using Google Gemini, create a Gemini API key and place it in:
 ```
 backend/.env
@@ -180,7 +183,7 @@ GEMINI_API_KEY=your_api_key
 > Do not commit .env or API keys to Git.
 <br>
 
-## Running the Application
+## 📖 Running the Application
 1. Clone the repository:
 ```
 git clone <your-repository-url>
