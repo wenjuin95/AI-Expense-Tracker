@@ -6,7 +6,6 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost
       DATA_DIR: /app/data
       OLLAMA_HOST: http://host.docker.internal:11434
     extra_hosts:

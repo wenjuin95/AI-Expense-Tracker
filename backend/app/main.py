@@ -24,6 +24,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
+print("=========================================")
+print(f"LOADED CORS ORIGINS: {origins}")
+print("=========================================")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
