@@ -5,7 +5,7 @@ export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-dvh bg-gray-100 overflow-hidden w-full">
 
       {/* Mobile Overlay - Darkens the background when menu is open on phones */}
       {isSidebarOpen && (
@@ -67,10 +67,10 @@ export default function Layout() {
       </aside>
 
       {/* Main content wrapper */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 relative">
 
         {/* Mobile Header with Hamburger Button (Only visible on small screens) */}
-        <header className="md:hidden flex items-center bg-white p-4 shadow-sm z-10">
+        <header className="sticky top-0 z-30 flex-none md:hidden flex items-center bg-white p-4 shadow-sm">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 mr-3 bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 focus:outline-none"
