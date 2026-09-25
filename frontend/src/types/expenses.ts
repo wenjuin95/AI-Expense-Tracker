@@ -105,6 +105,7 @@ export interface BatchScanResponse {
 
 export interface ExpensePieChartProps {
 	expenses: Expense[];
+	error: string | null;
 }
 
 export interface CategoryData {

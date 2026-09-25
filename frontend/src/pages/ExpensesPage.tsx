@@ -16,11 +16,19 @@ export default function ExpensesPage() {
 
   const loadExpenses = async () => {
     try {
-      setLoading(true);
-      setExpenses(await getExpenses());
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load expenses.");
+        setLoading(true);
+        setExpenses(await getExpenses());
+        setError(null);
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message.includes("Failed to fetch")) {
+                setError("To request testing access for the app, please email Low Wen Juin at lowwenjuin27@gmail.com.");
+            } else {
+                setError(error.message);
+            }
+        } else {
+            setError("Failed to load expenses.");
+        }
     } finally {
       setLoading(false);
     }
@@ -79,10 +87,18 @@ export default function ExpensesPage() {
 
       <h1 className="text-2xl font-bold text-slate-900">Expenses</h1>
 
-      <ExpensePieChart expenses={expenses} />
+      <ExpensePieChart expenses={expenses} error={error} />
 
-      {expenses.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-400">No expenses yet.</div>
+      <h2 className="text-2xl font-bold text-slate-900">History</h2>
+
+      {error ? (
+        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-400">
+            {error}
+        </div>
+      ) : expenses.length === 0 ? (
+        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-400">
+            No expenses yet
+        </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-left border-collapse text-sm">

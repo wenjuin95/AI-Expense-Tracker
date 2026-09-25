@@ -5,7 +5,7 @@ export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-[100dvh] bg-gray-100 overflow-hidden w-full">
+    <div className="flex h-dvh bg-gray-100 overflow-hidden w-full">
 
       {/* Mobile Overlay */}
       {isSidebarOpen && (
@@ -21,9 +21,9 @@ export default function Layout() {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-xl font-bold tracking-wide">Expense Tracker</h1>
-        </div> */}
+        </div>
 
         <nav className="flex flex-col space-y-2">
           <NavLink

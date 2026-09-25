@@ -11,6 +11,7 @@ import type { CategoryData, ExpensePieChartProps } from "../types/expenses";
 
 export default function ExpensePieChart({
 	expenses,
+	error,
 }: ExpensePieChartProps) {
 
 	const categoryColors: Record<string, string> = {
@@ -46,14 +47,18 @@ export default function ExpensePieChart({
 		0
 	);
 
-	if (data.length === 0) {
+	if (error) {
 		return (
 			<div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
-				<h2 className="text-lg font-bold text-slate-900">
-					Expense Overview
-				</h2>
-
-				<div className="h-64 flex items-center justify-center text-sm text-slate-400">
+				<p className="h-64 flex items-center justify-center text-slate-400">
+					{error}
+				</p>
+			</div>
+		);
+	} else if (data.length === 0) {
+		return (
+			<div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
+				<div className="h-64 flex items-center justify-center text-slate-400">
 					No expense data available.
 				</div>
 			</div>
